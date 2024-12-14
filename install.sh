@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Update package list and install Docker
 echo "Updating package list and installing Docker..."
 sudo apt update
@@ -19,6 +18,12 @@ echo "Creating directory for WG-Easy configuration..."
 mkdir -p ~/wgeasy/wg-easy
 cd ~/wgeasy
 
+# Create .env file with password hash
+echo "Creating .env file..."
+cat <<EOL > .env
+WG_PASSWORD_HASH=\$2b\$10\$WIqvUthA5OiMXK0yYhLR7.ymQCMwRkOrfXmNNK5T3CWwjJU7ZBCnq
+EOL
+
 # Create docker-compose.yml for WG-Easy
 echo "Creating docker-compose.yml for WG-Easy..."
 cat <<EOL > docker-compose.yml
@@ -28,11 +33,11 @@ services:
     image: ghcr.io/wg-easy/wg-easy  
     container_name: wg-easy         
     environment:                    
-      - LANG=en                     
-      - WG_HOST=your_public_ip_here    # Replace with your actual server public IP
-      - PASSWORD=soethu69    # Change password as needed
-      - PORT=51821                  
-      - WG_PORT=51820             
+      LANG: en                     
+      WG_HOST: your_public_ip_here    # Replace with your actual server public IP
+      PASSWORD_HASH: \${WG_PASSWORD_HASH}
+      PORT: 51821                  
+      WG_PORT: 51820             
     volumes:
       - ./wg-easy/:/etc/wireguard   
     ports:
@@ -57,3 +62,5 @@ sudo docker-compose up -d
 
 echo "Installation and setup complete!"
 echo "Please replace 'your_public_ip_here' in the docker-compose.yml file with your actual public IP if you haven't done so already."
+echo "Access WG-Easy at http://your-server-ip:51821"
+echo "Default password is: "
